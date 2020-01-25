@@ -7,31 +7,44 @@ export default class Timer extends React.Component {
         countdown: ''
     }
     componentDidMount() {
-        this.targetDate = this.setTargetDate();
         this.startTimer();  
     }
     componentWillUnmount() {
         this.stopTimer();
     }
     setTargetDate() {
-        let newDate = new Date();
-        let targetDateInMilliSeconds = newDate.setHours(17, 0, 0, 0)
-        let targetDate = new Date(targetDateInMilliSeconds);
-        return targetDate;
+        this.targetDate = new Date(2020, 3, 27, 6, 0, 0);
+        return this.targetDate.valueOf();
     }
-    msToTime(s) {
-        var ms = s % 1000;
-        s = (s - ms) / 1000;
-        var secs = s % 60;
-        s = (s - secs) / 60;
-        var mins = s % 60;
-        var hrs = (s - mins) / 60;
-        return hrs + ':' + mins + ':' + secs;
-      }
+    dhms(t) {
+        let cd = 24*60*60*1000,
+        ch = 60*60*1000,
+        cs = 60*1000,
+        // cms = 1000,
+        d = Math.floor(t/cd),
+        h = Math.floor((t - d * cd) / ch),
+        m = Math.round((t - d * cd - h * ch) / cs),
+        // s = Math.floor((t - d * cd - h * ch - m * cs) / cms),
+        pad = function (n) { return n < 10 ? '0' + n : n; };
+        // if (s === 60) {
+        //     m++;
+        //     s = 0;
+        // }
+        if (m === 60) {
+            h++;
+            m = 0;
+        }
+        if (h === 24) {
+            d++;
+            h = 0;
+        }
+        return d + " days " + pad(h) + " hours " + pad(m) + " minutes"
+        // return d + " days " + pad(h) + " hours " + pad(m) + " minutes " + pad(s) + " seconds"
+    }
     calculateCountdownTimer(targetTime) {
         let currentTime = new Date();
-        let countdownTimer = (this.state.target - currentTime);
-        let convertedTime = this.msToTime(countdownTimer);
+        let countdownTimer = (this.state.target - currentTime.valueOf());
+        let convertedTime = this.dhms(countdownTimer);
         this.setState({countdown: convertedTime, currentTime: currentTime})
     }
     startTimer() {
@@ -47,9 +60,8 @@ export default class Timer extends React.Component {
     }
     render() {
         return <div>
-            <p><b>Target Time: </b>{this.state.target.toLocaleTimeString()}</p>
-            <p><b>Current Timer: </b>{this.state.currentTime.toLocaleTimeString()}</p>
-            <p><b>Countdown Timer: </b>{this.state.countdown}</p>
+            <p><b>Wedding Day: </b>{this.targetDate.toLocaleString()}</p>
+            <p><b>Time Remaining: </b>{this.state.countdown}</p>
         </div>
     }
 }
